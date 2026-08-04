@@ -1491,6 +1491,7 @@
       var [items,setItems]=useState(props.exercises.slice());
       var [activeDrag,setActiveDrag]=useState(null);
       var [overIdx,setOverIdx]=useState(null);
+      var [ghostPos,setGhostPos]=useState(null); // {x,y,width,name,pattern}
       var dragIdx=useRef(null);
       var dragOverIdx=useRef(null);
       function onDragStart(i){dragIdx.current=i;setActiveDrag(i);}
@@ -1504,11 +1505,22 @@
         dragIdx.current=null; dragOverIdx.current=null; setActiveDrag(null); setOverIdx(null);
       }
       // Touch drag support
-      var touchStartY=useRef(0); var touchDragIdx=useRef(null);
-      function onTouchStart(i,e){touchDragIdx.current=i;touchStartY.current=e.touches[0].clientY;setActiveDrag(i);}
+      var touchDragIdx=useRef(null);
+      function onTouchStart(i,e){
+        var touch=e.touches[0];
+        var el=e.currentTarget;
+        var r=el.getBoundingClientRect();
+        touchDragIdx.current=i;
+        setActiveDrag(i);
+        dragOverIdx.current=i;
+        setOverIdx(i);
+        setGhostPos({x:r.left,y:touch.clientY-r.height/2,width:r.width,name:items[i].name,pattern:items[i].pattern,color:PC[items[i].pattern]||T.textMuted});
+      }
       function onTouchMove(e){
         e.preventDefault();
-        var y=e.touches[0].clientY;
+        var touch=e.touches[0];
+        var y=touch.clientY;
+        setGhostPos(function(g){return g?{...g,y:y-30}:g;});
         var els=document.querySelectorAll(".reorder-item");
         var target=null;
         els.forEach(function(el,idx){var r=el.getBoundingClientRect();if(y>=r.top&&y<=r.bottom){target=idx;}});
@@ -1521,10 +1533,10 @@
           arr.splice(to,0,arr.splice(from,1)[0]);
           setItems(arr);
         }
-        touchDragIdx.current=null; dragOverIdx.current=null; setActiveDrag(null); setOverIdx(null);
+        touchDragIdx.current=null; dragOverIdx.current=null; setActiveDrag(null); setOverIdx(null); setGhostPos(null);
       }
       return (
-        <div className="ai">
+        <div className="ai" style={{position:"relative"}}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 20px",borderBottom:"1px solid "+T.border,background:T.surface,position:"sticky",top:48,zIndex:10}}>
             <span style={{fontSize:14,fontWeight:500}}>Reorder exercises</span>
             <div style={{display:"flex",gap:8}}>
@@ -1550,11 +1562,11 @@
                   style={{
                     margin:"0 16px 8px",padding:"12px 16px",
                     background:isDragging?"transparent":T.surface,
-                    border:"1px solid "+(isOver?T.accent:T.border),
-                    borderLeft:"3px solid "+(isDragging?"transparent":color),
+                    border:"1px solid "+(isOver?T.accent:isDragging?"transparent":T.border),
+                    borderLeft:"3px solid "+(isDragging?"transparent":isOver?T.accent:color),
                     borderRadius:4,display:"flex",alignItems:"center",gap:12,
                     cursor:"grab",userSelect:"none",touchAction:"none",
-                    opacity:isDragging?0.35:1,
+                    opacity:isDragging?0.25:1,
                     boxShadow:isOver?"0 0 0 2px "+T.accent:"none",
                     transform:isOver?"scaleY(1.04)":"none",
                     transition:"transform 0.12s,box-shadow 0.12s,opacity 0.12s"
@@ -1568,6 +1580,22 @@
               );
             })}
           </div>
+          {ghostPos&&(
+            <div style={{
+              position:"fixed",left:ghostPos.x,top:ghostPos.y,width:ghostPos.width,
+              padding:"12px 16px",background:T.surface,
+              border:"1px solid "+T.accent,borderLeft:"3px solid "+ghostPos.color,
+              borderRadius:4,display:"flex",alignItems:"center",gap:12,
+              boxShadow:"0 8px 24px rgba(0,0,0,0.25)",opacity:0.96,
+              pointerEvents:"none",zIndex:9999,transform:"scale(1.03)"
+            }}>
+              <span style={{color:T.textMuted,fontSize:18,lineHeight:1}}>☰</span>
+              <div>
+                <div style={{fontSize:13,fontWeight:500}}>{ghostPos.name}</div>
+                <div style={{fontSize:10,color:ghostPos.color,textTransform:"uppercase",letterSpacing:0.4,marginTop:2}}>{ghostPos.pattern}</div>
+              </div>
+            </div>
+          )}
         </div>
       );
     }

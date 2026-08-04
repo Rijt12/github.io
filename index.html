@@ -450,6 +450,8 @@
         };
       }, []);
 
+      useEffect(function(){ requestAnimationFrame(function(){ window.scrollTo(0,0); }); }, [navKey]);
+
       if (!data) { return <Loader />; }
 
       function persist(d) {

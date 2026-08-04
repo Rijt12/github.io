@@ -1202,7 +1202,7 @@
     function TemplateEditor(props) {
       var library=props.library||[]; var tpl=props.template; var setTpl=props.onChange;
       var [showAdd,setShowAdd]=useState(false); var [search,setSearch]=useState("");
-      function addFromLib(ex){setTpl({...tpl,exercises:tpl.exercises.concat([{id:uid(),name:ex.name,pattern:ex.pattern,unilateral:ex.unilateral||false,sets:[{weight:"",reps:""}]}])});setSearch("");setShowAdd(false);}
+      function addFromLib(ex){setTpl({...tpl,exercises:tpl.exercises.concat([{id:uid(),name:ex.name,pattern:ex.pattern,unilateral:ex.unilateral||false,sets:[{weight:"",reps:""},{weight:"",reps:""},{weight:"",reps:""}]}])});setSearch("");setShowAdd(false);}
       function removeEx(idx){setTpl({...tpl,exercises:tpl.exercises.filter(function(_,i){return i!==idx;})});}
       function addSet(idx){var exs=tpl.exercises.map(function(e,i){if(i!==idx){return e;}var last=e.sets[e.sets.length-1];return {...e,sets:e.sets.concat([{weight:last?last.weight:"",reps:last?last.reps:""}])};});setTpl({...tpl,exercises:exs});}
       function updateSet(exIdx,sIdx,field,val){var exs=tpl.exercises.map(function(e,i){if(i!==exIdx){return e;}var sets=e.sets.map(function(s,j){return j===sIdx?{...s,[field]:val}:s;});return {...e,sets:sets};});setTpl({...tpl,exercises:exs});}
@@ -1449,8 +1449,8 @@
       function togglePattern(p){setActivePatterns(function(prev){var next=Object.assign({},prev);var numOff=Object.keys(next).filter(function(k){return next[k]===false;}).length;if(numOff===0){PATTERNS.forEach(function(x){next[x]=false;});next[p]=true;}else if(next[p]===false){next[p]=true;var stillOff=PATTERNS.filter(function(x){return next[x]===false;});if(stillOff.length===0){return{};}}else{next[p]=false;}return next;});}
       var patternActive=function(p){return Object.keys(activePatterns).length===0||activePatterns[p]!==false;};
       var filtered=library.filter(function(e){return e.name.toLowerCase().includes(search.toLowerCase())&&patternActive(e.pattern);}).sort(function(a,b){return a.name.localeCompare(b.name);});
-      function selectLib(ex){props.onAdd({id:uid(),name:ex.name,pattern:ex.pattern,unilateral:ex.unilateral||false,isUnilateralExercise:ex.unilateral||false,performedUnilateral:false,sets:[{weight:"",reps:""}],notes:""});}
-      function addCustom(){if(!customName.trim()){return;}props.onAdd({id:uid(),name:customName.trim(),pattern:pattern,unilateral:unilateral,isUnilateralExercise:unilateral,performedUnilateral:false,sets:[{weight:"",reps:""}],notes:""});}
+      function selectLib(ex){props.onAdd({id:uid(),name:ex.name,pattern:ex.pattern,unilateral:ex.unilateral||false,isUnilateralExercise:ex.unilateral||false,performedUnilateral:false,sets:[{weight:"",reps:""},{weight:"",reps:""},{weight:"",reps:""}],notes:""});}
+      function addCustom(){if(!customName.trim()){return;}props.onAdd({id:uid(),name:customName.trim(),pattern:pattern,unilateral:unilateral,isUnilateralExercise:unilateral,performedUnilateral:false,sets:[{weight:"",reps:""},{weight:"",reps:""},{weight:"",reps:""}],notes:""});}
       return (
         <div style={{background:T.surface,border:"1px solid "+T.border,borderRadius:4}}>
           <div style={{height:10,background:T.surface}}/>
@@ -1610,7 +1610,7 @@
       useEffect(function(){if(inputRef.current){inputRef.current.focus();}}, [step]);
       function togglePattern(p){setActivePatterns(function(prev){var next=Object.assign({},prev);var numOff=Object.keys(next).filter(function(k){return next[k]===false;}).length;if(numOff===0){PATTERNS.forEach(function(x){next[x]=false;});next[p]=true;}else if(next[p]===false){next[p]=true;var stillOff=PATTERNS.filter(function(x){return next[x]===false;});if(stillOff.length===0){return{};}}else{next[p]=false;}return next;});}
       var patternActive=function(p){return Object.keys(activePatterns).length===0||activePatterns[p]!==false;};
-      function makeEx(ex){return {id:uid(),name:ex.name,pattern:ex.pattern,unilateral:ex.unilateral||false,isUnilateralExercise:ex.unilateral||false,performedUnilateral:false,sets:[{weight:"",reps:""}],notes:""};}
+      function makeEx(ex){return {id:uid(),name:ex.name,pattern:ex.pattern,unilateral:ex.unilateral||false,isUnilateralExercise:ex.unilateral||false,performedUnilateral:false,sets:[{weight:"",reps:""},{weight:"",reps:""},{weight:"",reps:""}],notes:""};}
       function selectA(ex){setExA(makeEx(ex));setStep(2);setSearch("");setActivePatterns({});}
       function selectB(ex){props.onAdd(exA,makeEx(ex));}
       var filtered=library.filter(function(e){

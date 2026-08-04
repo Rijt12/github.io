@@ -1816,7 +1816,7 @@
           {open&&(
             <div style={{padding:"0 20px 14px"}}>
               {prevData&&<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}><span style={{fontSize:10,color:T.textMuted,textTransform:"uppercase",letterSpacing:0.5}}>Previous · {fmtDate(prevData.date)}</span><button onClick={props.onViewHistory} style={{background:"none",border:"none",color:T.accent,fontSize:10,textTransform:"uppercase",letterSpacing:0.4,cursor:"pointer",padding:0}}>History →</button></div>}
-              <div style={{display:"grid",gridTemplateColumns:prevData?"24px auto 1fr 1fr":"24px 1fr 1fr",gap:6,marginBottom:5,padding:"0 4px"}}>
+              <div style={{display:"grid",gridTemplateColumns:prevData?"24px 68px 1fr 1fr":"24px 1fr 1fr",gap:6,marginBottom:5,padding:"0 4px"}}>
                 <span style={lS}>#</span>
                 {prevData&&<span style={lS}>prev</span>}
                 <span style={lS}>kg</span><span style={lS}>reps</span>
@@ -1833,7 +1833,7 @@
                     if(s){
                       rows.push(
                         <SwipeRow key={idx} rowId={rowId} openId={openSetId} onOpen={setOpenSetId} background={T.surface} onDelete={function(ii){return function(){removeSet(ii);};}(idx)}>
-                          <div style={{display:"grid",gridTemplateColumns:prevData?"24px auto 1fr 1fr":"24px 1fr 1fr",gap:6,padding:"4px 20px",alignItems:"center"}}>
+                          <div style={{display:"grid",gridTemplateColumns:prevData?"24px 68px 1fr 1fr":"24px 1fr 1fr",gap:6,padding:"4px 20px",alignItems:"center"}}>
                             <span style={{color:T.textMuted,fontSize:12,textAlign:"center"}}>{idx+1}</span>
                             {prevData&&<span style={{fontSize:11,color:T.textMuted,whiteSpace:"nowrap"}}>{ps?(ps.weight?ps.weight+"kg":"—")+" × "+(ps.reps||"—"):"—"}</span>}
                             <Stepper value={s.weight} step={0.5} placeholder={ps&&ps.weight?ps.weight+"":""} onChange={function(ii){return function(v){updateSet(ii,"weight",v);};}(idx)}/>
@@ -1843,7 +1843,7 @@
                       );
                     } else {
                       rows.push(
-                        <div key={idx} style={{display:"grid",gridTemplateColumns:"24px auto 1fr 1fr",gap:6,padding:"6px 20px",alignItems:"center",opacity:0.5}}>
+                        <div key={idx} style={{display:"grid",gridTemplateColumns:"24px 68px 1fr 1fr",gap:6,padding:"6px 20px",alignItems:"center",opacity:0.5}}>
                           <span style={{color:T.textMuted,fontSize:12,textAlign:"center"}}>{idx+1}</span>
                           <span style={{fontSize:11,color:T.textMuted,whiteSpace:"nowrap"}}>{ps?(ps.weight?ps.weight+"kg":"—")+" × "+(ps.reps||"—"):"—"}</span>
                           <span/><span/>

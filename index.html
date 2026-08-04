@@ -1769,31 +1769,47 @@
           </div>
           {open&&(
             <div style={{padding:"0 20px 14px"}}>
-              <div style={{display:"grid",gridTemplateColumns:"24px 1fr 1fr",gap:6,marginBottom:5,padding:"0 4px"}}><span style={lS}>#</span><span style={lS}>kg</span><span style={lS}>reps</span></div>
-              <div style={{margin:"0 -20px"}}>
-                {activeSets.map(function(s,i){var rowId="set-"+ex.id+"-"+i; return(
-                  <SwipeRow key={i} rowId={rowId} openId={openSetId} onOpen={setOpenSetId} background={T.surface} onDelete={function(){removeSet(i);}}>
-                    <div style={{display:"grid",gridTemplateColumns:"24px 1fr 1fr",gap:6,padding:"4px 20px"}}>
-                      <span style={{color:T.textMuted,fontSize:12,paddingTop:10,textAlign:"center"}}>{i+1}</span>
-                      <Stepper value={s.weight} step={0.5} placeholder="kg" onChange={function(v){updateSet(i,"weight",v);}}/>
-                      <Stepper value={s.reps} step={1} placeholder="reps" onChange={function(v){updateSet(i,"reps",v);}}/>
-                    </div>
-                  </SwipeRow>
-                );})}
+              {prevData&&<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}><span style={{fontSize:10,color:T.textMuted,textTransform:"uppercase",letterSpacing:0.5}}>Previous · {fmtDate(prevData.date)}</span><button onClick={props.onViewHistory} style={{background:"none",border:"none",color:T.accent,fontSize:10,textTransform:"uppercase",letterSpacing:0.4,cursor:"pointer",padding:0}}>History →</button></div>}
+              <div style={{display:"grid",gridTemplateColumns:prevData?"24px auto 1fr 1fr":"24px 1fr 1fr",gap:6,marginBottom:5,padding:"0 4px"}}>
+                <span style={lS}>#</span>
+                {prevData&&<span style={lS}>prev</span>}
+                <span style={lS}>kg</span><span style={lS}>reps</span>
               </div>
-              <button onClick={addSet} style={{background:"none",border:"1px dashed "+T.borderStrong,color:T.textMuted,padding:"6px 12px",fontSize:11,textTransform:"uppercase",letterSpacing:0.4,marginTop:6,cursor:"pointer",width:"100%",borderRadius:4}}>+ Set toevoegen</button>
-              <div style={{marginTop:10}}><textarea value={(isB?(ex.notesB!=null?ex.notesB:""):ex.notes)||""} onChange={function(e){if(isB){props.onChange({...ex,notesB:e.target.value});}else{props.onChange({...ex,notes:e.target.value});}}} placeholder="Opmerking bij deze oefening..." rows={2} style={{...iS,resize:"none",fontSize:12,color:T.textMid,background:T.surfaceAlt,marginTop:2}}/></div>
-              {prevData&&(
-                <div style={{marginTop:10,padding:"8px 10px",background:T.surfaceAlt,border:"1px solid "+T.border,borderRadius:4}}>
-                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
-                    <span style={{fontSize:10,color:T.textMuted,textTransform:"uppercase",letterSpacing:0.5}}>Vorige · {fmtDate(prevData.date)}</span>
-                    <button onClick={props.onViewHistory} style={{background:"none",border:"none",color:T.accent,fontSize:10,textTransform:"uppercase",letterSpacing:0.4,cursor:"pointer",padding:0}}>Volledige historie →</button>
-                  </div>
-                  <div style={{display:"flex",gap:5,flexWrap:"wrap"}}>
-                    {prevData.sets.map(function(s,i){return <span key={i} style={{fontSize:11,padding:"3px 7px",background:T.surface,border:"1px solid "+T.border,borderRadius:4,color:T.textMid}}>{i+1}. {s.weight?s.weight+"kg":"—"} × {s.reps||"—"}</span>;})}
-                  </div>
-                </div>
-              )}
+              <div style={{margin:"0 -20px"}}>
+                {(function(){
+                  var totalRows=Math.max(activeSets.length, prevData?prevData.sets.length:0);
+                  var rows=[];
+                  for(var i=0;i<totalRows;i++){
+                    var s=activeSets[i];
+                    var ps=prevData&&prevData.sets[i];
+                    var idx=i;
+                    var rowId="set-"+ex.id+"-"+idx;
+                    if(s){
+                      rows.push(
+                        <SwipeRow key={idx} rowId={rowId} openId={openSetId} onOpen={setOpenSetId} background={T.surface} onDelete={function(ii){return function(){removeSet(ii);};}(idx)}>
+                          <div style={{display:"grid",gridTemplateColumns:prevData?"24px auto 1fr 1fr":"24px 1fr 1fr",gap:6,padding:"4px 20px",alignItems:"center"}}>
+                            <span style={{color:T.textMuted,fontSize:12,textAlign:"center"}}>{idx+1}</span>
+                            {prevData&&<span style={{fontSize:11,color:T.textMuted,whiteSpace:"nowrap"}}>{ps?(ps.weight?ps.weight+"kg":"—")+" × "+(ps.reps||"—"):"—"}</span>}
+                            <Stepper value={s.weight} step={0.5} placeholder={ps&&ps.weight?ps.weight+"":""} onChange={function(ii){return function(v){updateSet(ii,"weight",v);};}(idx)}/>
+                            <Stepper value={s.reps} step={1} placeholder={ps&&ps.reps?ps.reps+"":""} onChange={function(ii){return function(v){updateSet(ii,"reps",v);};}(idx)}/>
+                          </div>
+                        </SwipeRow>
+                      );
+                    } else {
+                      rows.push(
+                        <div key={idx} style={{display:"grid",gridTemplateColumns:"24px auto 1fr 1fr",gap:6,padding:"6px 20px",alignItems:"center",opacity:0.5}}>
+                          <span style={{color:T.textMuted,fontSize:12,textAlign:"center"}}>{idx+1}</span>
+                          <span style={{fontSize:11,color:T.textMuted,whiteSpace:"nowrap"}}>{ps?(ps.weight?ps.weight+"kg":"—")+" × "+(ps.reps||"—"):"—"}</span>
+                          <span/><span/>
+                        </div>
+                      );
+                    }
+                  }
+                  return rows;
+                })()}
+              </div>
+              <button onClick={addSet} style={{background:"none",border:"1px dashed "+T.borderStrong,color:T.textMuted,padding:"6px 12px",fontSize:11,textTransform:"uppercase",letterSpacing:0.4,marginTop:6,cursor:"pointer",width:"100%",borderRadius:4}}>+ Add set</button>
+              <div style={{marginTop:10}}><textarea value={(isB?(ex.notesB!=null?ex.notesB:""):ex.notes)||""} onChange={function(e){if(isB){props.onChange({...ex,notesB:e.target.value});}else{props.onChange({...ex,notes:e.target.value});}}} placeholder="Comment for this exercise..." rows={2} style={{...iS,resize:"none",fontSize:12,color:T.textMid,background:T.surfaceAlt,marginTop:2}}/></div>
             </div>
           )}
         </div>
